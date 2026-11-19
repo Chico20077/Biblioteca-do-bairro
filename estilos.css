@@ -169,3 +169,6 @@ body.tamanho-grande {
     padding: 10px;
   }
 }
+body.escuro aside p {
+  color: #F0F2F5;
+}
