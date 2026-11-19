@@ -1,112 +1,153 @@
+
 <!DOCTYPE html>
 <html lang="pt-PT">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biblioteca do Bairro</title>
-    <script src="src.js" defer></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="estilos.css">
-    
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Biblioteca do Bairro</title>
+  <script src="src.js" defer></script>
+  <link rel="stylesheet" href="estilos.css">
 </head>
 <body>
-
-    <header class="cabecalho">
-        <h1>Biblioteca do Bairro</h1>
-        <nav>
-            <ul>
-                <li><a href="#">Início</a></li>
-                <li><a href="#">Catálogo</a></li>
-                <li><a href="#">Eventos</a></li>
-            </ul>
-        </nav>
-    </header>
-
-
-    <div class="aviso">
-        <p>Novidade: <mark>sala infantil</mark>!</p>
+  <header class="cabecalho" id="inicio">
+    <div>
+      <h1>Biblioteca do Bairro</h1>
+      <p>Um lugar para descobrir histórias.</p>
     </div>
 
+    <nav>
+      <ul>
+        <li><a href="#inicio">Início</a></li>
+        <li><a href="#catalogo">Catálogo</a></li>
+        <li><a href="#leitura">Lista de leitura</a></li>
+        <li><a href="#dados">Os meus dados</a></li>
+      </ul>
+    </nav>
+  </header>
 
-    <main>
-        <section class="boas-vindas">
-            <p class="destaque">A biblioteca abriu em 1987. Hoje tem mais de 20 000 livros.</p>
-            <p>Use &lt;p&gt; para parágrafos.</p>
-            <p>Escreva <code>&lt;p&gt;</code> no editor.</p>
-        </section>
+  <section id="aviso-visita" hidden>
+    <p>Hoje a biblioteca fecha às 13h.</p>
+    <button id="fechar-aviso">Fechar aviso</button>
+  </section>
 
-        <h2>Serviços</h2>
-        <div class="cartoes">
-            <article class="cartao">
-                <h3>Empréstimo de livros</h3>
-                <p>Devolva os livros <em>a tempo</em>.</p>
-                <p>Quota: 5&nbsp;€</p>
-            </article>
-            <article class="cartao">
-                <h3>Sala de estudo</h3>
-                <p>H<sub>2</sub>O e 2<sup>10</sup></p>
-                <a href="#" class="botao">Inscrever-me</a>
-            </article>
-        </div>
+  <main>
+    <section>
+      <h2>Bem-vindo!</h2>
+      <p>A biblioteca abriu em 1987 e tem mais de 20 000 livros.</p>
+    </section>
 
-        <h2>Destaques do Catálogo</h2>
-        <section class="catalogo">
-            <article class="cartao destaque-livro">
-                <h3>Livro em Destaque</h3>
-                <p>O Principezinho</p>
-            </article>
-            <article class="cartao">
-                <h3>Os Maias</h3>
-                <p>Eça de Queirós</p>
-            </article>
-            <article class="cartao">
-                <h3>Mensagem</h3>
-                <p>Fernando Pessoa</p>
-            </article>
-        </section>
+    <section class="cartao">
+      <h2>Preferências</h2>
 
-<section class="pesquisa-livros">
-    <h2>Pesquisar livros</h2>
+      <button id="tema">Alternar tema escuro</button>
+      <button id="seguir-sistema">Seguir o sistema</button>
 
-    <input
-        type="text"
-        id="pesquisa"
-        placeholder="Escreve o título de um livro..."
-    >
+      <button id="letra-menor">A−</button>
+      <button id="letra-maior">A+</button>
+      <button id="letra-normal">Letra normal</button>
 
-    <button type="button" id="so-disponiveis">
+      <p id="estado-preferencias"></p>
+    </section>
+
+    <section id="catalogo">
+      <h2>Catálogo</h2>
+
+      <input id="pesquisa" type="search"
+             placeholder="Pesquisar livros...">
+
+      <button id="so-disponiveis">
         Mostrar apenas disponíveis
+      </button>
+
+      <p id="resumo"></p>
+      <ul id="lista-livros"></ul>
+
+      <h3>Últimas pesquisas</h3>
+      <ul id="ultimas-pesquisas"></ul>
+      <button id="limpar-pesquisas">Limpar histórico</button>
+    </section>
+
+    <section id="leitura" class="cartao">
+      <h2>Lista de leitura</h2>
+
+      <form id="form-leitura">
+        <input id="novo-livro"
+               placeholder="Nome do livro"
+               required>
+        <button>Adicionar</button>
+      </form>
+
+      <ul id="lista-leitura"></ul>
+      <p id="estado-leitura"></p>
+    </section>
+
+    <section class="cartao">
+      <h2>Ficha do leitor</h2>
+
+      <form id="form-leitor">
+        <label for="nome-leitor">Nome</label>
+        <input id="nome-leitor" value="Ana">
+
+        <label for="cartao-leitor">Cartão</label>
+        <input id="cartao-leitor" value="DEMO-001">
+
+        <label for="generos-leitor">Géneros</label>
+        <input id="generos-leitor"
+               value="Romance, Policial">
+
+        <button>Guardar ficha</button>
+      </form>
+
+      <p id="saudacao-leitor"></p>
+      <ul id="generos-lista"></ul>
+
+      <button id="apagar-ficha">Apagar ficha</button>
+    </section>
+
+    <section class="cartao">
+      <h2>Sugerir um livro</h2>
+
+      <form id="form-sugestao">
+        <textarea id="sugestao"
+                  placeholder="A tua sugestão"></textarea>
+
+        <button>Enviar sugestão</button>
+      </form>
+
+      <p id="estado-sugestao"></p>
+    </section>
+
+    <section id="dados" class="cartao">
+      <h2>Os meus dados</h2>
+
+      <button id="ver-dados">
+        Ver dados guardados
+      </button>
+
+      <pre id="dados-guardados"></pre>
+
+      <button id="apagar-dados">
+        Apagar os dados deste site
+      </button>
+
+      <p id="estado-dados"></p>
+    </section>
+  </main>
+
+  <aside>
+    <h2>Horário</h2>
+    <p>Aberto das 09h às 20h.</p>
+
+    <p id="contador-visitas"></p>
+    <button id="recomecar-visitas">
+      Recomeçar contador
     </button>
+  </aside>
 
-    <p id="resumo"></p>
-
-    <ul id="lista-livros"></ul>
-</section>
-
-    </main>
-
-    <aside>
-        <h2>Horário</h2>
-        <h3>Época de exames</h3>
-        <p>Aberto das 09h às 20h.</p>
-    </aside>
-
-    <footer class="rodape">
-        <div>
-            <p>Rua das Flores, 12<br>4700-123 Braga</p>
-        </div>
-        <div>
-            <p>Apoio: <abbr title="Câmara Municipal">CM</abbr></p>
-            <p>Entrada livre.</p>
-            <p>A inscrição é <strong>gratuita</strong>.</p>
-        </div>
-        <div>
-            <p><small>Fotos: arquivo municipal.</small></p>
-            <p>&copy; 2026 Biblioteca</p>
-        </div>
-    </footer>
-
+  <footer>
+    <p>Rua das Flores, 12 — Braga</p>
+    <p>Entrada livre.</p>
+    <p>© 2026 Biblioteca</p>
+  </footer>
 </body>
 </html>
