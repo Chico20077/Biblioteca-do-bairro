@@ -147,7 +147,7 @@ console.log(emprestar("Os Maias"));
 // --- EXERCÍCIO 7: O catálogo na página ---
 // ==========================================
 const lista = document.querySelector("#lista-livros");
-const resumo = document.querySelector("h2");
+const resumo = document.querySelector("#resumo");
 
 function mostrarLivros(livrosLista) {
     if (!lista) return; 

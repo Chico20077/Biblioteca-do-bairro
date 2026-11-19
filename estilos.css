@@ -200,3 +200,38 @@ img {
     }
     footer.rodape { grid-area: rodape; }
 }
+
+.pesquisa-livros {
+    margin-top: 2rem;
+}
+
+#pesquisa {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 8px;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+#so-disponiveis {
+    padding: 10px 16px;
+    background: var(--cor-principal);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#so-disponiveis:hover {
+    background: var(--cor-destaque);
+}
+
+#lista-livros {
+    margin-top: 1rem;
+}
+
+.indisponivel {
+    color: #A84B33;
+    text-decoration: line-through;
+}
