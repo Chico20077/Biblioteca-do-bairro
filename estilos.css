@@ -169,6 +169,14 @@ body.tamanho-grande {
     padding: 10px;
   }
 }
-body.escuro aside p {
-  color: #F0F2F5;
+/* Horário no tema escuro */
+body.escuro aside {
+    background-color: #263238;
+    color: #ffffff;
+}
+
+body.escuro aside p,
+body.escuro aside h2,
+body.escuro aside h3 {
+    color: #ffffff;
 }
