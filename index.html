@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-PT">
 <head>
@@ -14,20 +15,11 @@
       <p>Um lugar para descobrir histórias.</p>
     </div>
 
-    <button id="btn-menu"
-            type="button"
-            aria-expanded="false"
-            aria-controls="menu-principal">
-      Menu
-    </button>
-
-    <nav id="menu-principal">
+    <nav>
       <ul>
         <li><a href="#inicio">Início</a></li>
-        <li><a href="#destaque">Livro em destaque</a></li>
         <li><a href="#catalogo">Catálogo</a></li>
         <li><a href="#leitura">Lista de leitura</a></li>
-        <li><a href="#inscricao">Clube de leitura</a></li>
         <li><a href="#dados">Os meus dados</a></li>
       </ul>
     </nav>
@@ -35,7 +27,7 @@
 
   <section id="aviso-visita" hidden>
     <p>Hoje a biblioteca fecha às 13h.</p>
-    <button id="fechar-aviso" type="button">Fechar aviso</button>
+    <button id="fechar-aviso">Fechar aviso</button>
   </section>
 
   <main>
@@ -44,82 +36,49 @@
       <p>A biblioteca abriu em 1987 e tem mais de 20 000 livros.</p>
     </section>
 
-    <!-- Exercícios 05 e 06: Livro em destaque e ficha com data-* -->
-    <section id="destaque"
-             class="cartao"
-             data-id="42"
-             data-estado="emprestado"
-             data-devolucao="2026-12-03"
-             data-autor="fernando-pessoa">
-      <h2>Livro em destaque</h2>
-      <article class="ficha-destaque">
-        <h3 class="titulo-destaque">Os Maias</h3>
-        <img class="capa"
-             src="img/os-maias.jpg"
-             alt="Capa de Os Maias">
-        <p class="estado-livro"></p>
-        <a class="mais" href="/catalogo">Ver mais</a>
-        <button class="reservar" type="button">Reservar</button>
-      </article>
-    </section>
-
     <section class="cartao">
       <h2>Preferências</h2>
 
-      <button id="tema" type="button">Alternar tema escuro</button>
-      <button id="seguir-sistema" type="button">Seguir o sistema</button>
+      <button id="tema">Alternar tema escuro</button>
+      <button id="seguir-sistema">Seguir o sistema</button>
 
-      <button id="letra-menor" type="button">A−</button>
-      <button id="letra-maior" type="button">A+</button>
-      <button id="letra-normal" type="button">Letra normal</button>
+      <button id="letra-menor">A−</button>
+      <button id="letra-maior">A+</button>
+      <button id="letra-normal">Letra normal</button>
 
       <p id="estado-preferencias"></p>
     </section>
 
-    <!-- Exercício 11 (<template>) e Exercício 15 (Pesquisa em direto + role="status") -->
-    <section id="catalogo" class="cartao">
+    <section id="catalogo">
       <h2>Catálogo</h2>
 
-      <label for="pesquisa">Pesquisar livros</label>
-      <input id="pesquisa"
-             name="q"
-             type="search"
+      <input id="pesquisa" type="search"
              placeholder="Pesquisar livros...">
 
-      <button id="so-disponiveis" type="button">
+      <button id="so-disponiveis">
         Mostrar apenas disponíveis
       </button>
 
-      <p id="resumo" role="status" aria-live="polite"></p>
-
-      <template id="tpl-livro">
-        <li class="item-catalogo">
-          <span class="titulo-livro"></span>
-          <span class="autor-livro"></span>
-          <span class="badge-emprestado" hidden> — Emprestado</span>
-        </li>
-      </template>
-
+      <p id="resumo"></p>
       <ul id="lista-livros"></ul>
 
       <h3>Últimas pesquisas</h3>
       <ul id="ultimas-pesquisas"></ul>
-      <button id="limpar-pesquisas" type="button">Limpar histórico</button>
+      <button id="limpar-pesquisas">Limpar histórico</button>
     </section>
 
-    <!-- Exercícios 12 e 13: Lista de leitura com delegação e data-acao -->
     <section id="leitura" class="cartao">
       <h2>Lista de leitura</h2>
 
       <form id="form-leitura">
-        <label for="novo-livro">Novo livro</label>
         <input id="novo-livro"
-               placeholder="Nome do livro">
-        <button type="submit">Adicionar</button>
+               placeholder="Nome do livro"
+               required>
+        <button>Adicionar</button>
       </form>
 
       <ul id="lista-leitura"></ul>
-      <p id="estado-leitura" role="status" aria-live="polite"></p>
+      <p id="estado-leitura"></p>
     </section>
 
     <section class="cartao">
@@ -133,81 +92,41 @@
         <input id="cartao-leitor" value="1234">
 
         <label for="generos-leitor">Géneros</label>
-        <input id="generos-leitor" value="Aventura">
+        <input id="generos-leitor"
+               value="Aventura">
 
-        <button type="submit">Guardar ficha</button>
+        <button>Guardar ficha</button>
       </form>
 
       <p id="saudacao-leitor"></p>
       <ul id="generos-lista"></ul>
 
-      <button id="apagar-ficha" type="button">Apagar ficha</button>
+      <button id="apagar-ficha">Apagar ficha</button>
     </section>
 
-    <!-- Exercício 07: Contador de caracteres (máx. 200, alerta > 180) -->
     <section class="cartao">
       <h2>Sugerir um livro</h2>
 
       <form id="form-sugestao">
-        <label for="sugestao">A tua sugestão</label>
         <textarea id="sugestao"
-                  maxlength="200"
                   placeholder="A tua sugestão"></textarea>
-        <p id="contador-sugestao">0/200</p>
 
-        <button type="submit">Enviar sugestão</button>
+        <button>Enviar sugestão</button>
       </form>
 
-      <p id="estado-sugestao" role="status" aria-live="polite"></p>
-    </section>
-
-    <!-- Exercício 14: Formulário de inscrição com FormData e setCustomValidity -->
-    <section id="inscricao" class="cartao">
-      <h2>Inscrição no clube</h2>
-
-      <form id="form-clube">
-        <label for="nome-clube">Nome completo (nome e apelido)</label>
-        <input id="nome-clube"
-               name="nome"
-               type="text"
-               required
-               placeholder="Ex.: Ana Silva">
-
-        <label for="email-clube">E-mail</label>
-        <input id="email-clube"
-               name="email"
-               type="email"
-               required
-               placeholder="ana@exemplo.pt">
-
-        <label for="select-clube">Clube</label>
-        <select id="select-clube" name="clube">
-          <option value="Policiais">Policiais</option>
-          <option value="Ficção Científica">Ficção Científica</option>
-          <option value="Clássicos">Clássicos</option>
-        </select>
-
-        <label>
-          <input type="checkbox" name="regras" required>
-          Aceito as regras do clube de leitura
-        </label>
-
-        <button type="submit">Inscrever</button>
-      </form>
-
-      <p id="resumo-clube" role="status" aria-live="polite"></p>
+      <p id="estado-sugestao"></p>
     </section>
 
     <section id="dados" class="cartao">
       <h2>Os meus dados</h2>
 
-      <button id="ver-dados" type="button">
+      <button id="ver-dados">
         Ver dados guardados
       </button>
 
       <pre id="dados-guardados"></pre>
 
-      <button id="apagar-dados" type="button">
+      <button id="apagar-dados">
         Apagar os dados deste site
       </button>
 
@@ -220,7 +139,7 @@
     <p>Aberto das 09h às 20h.</p>
 
     <p id="contador-visitas"></p>
-    <button id="recomecar-visitas" type="button">
+    <button id="recomecar-visitas">
       Recomeçar contador
     </button>
   </aside>
