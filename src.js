@@ -1,4 +1,3 @@
-
 /* ================================
    FUNÇÕES DE ARMAZENAMENTO
 ================================ */
@@ -36,6 +35,88 @@ function guardarTexto(chave, valor) {
     return true;
   } catch {
     return false;
+  }
+}
+
+
+/* ================================
+   EX. 09 — MENU ACESSÍVEL (aria-expanded + Escape)
+================================ */
+
+const btnMenu = document.querySelector("#btn-menu");
+const menuPrincipal = document.querySelector("#menu-principal");
+
+if (btnMenu && menuPrincipal) {
+  btnMenu.addEventListener("click", () => {
+    const aberto = menuPrincipal.classList.toggle("aberto");
+    btnMenu.setAttribute("aria-expanded", String(aberto));
+  });
+
+  document.addEventListener("keydown", (evento) => {
+    if (evento.key === "Escape" && menuPrincipal.classList.contains("aberto")) {
+      menuPrincipal.classList.remove("aberto");
+      btnMenu.setAttribute("aria-expanded", "false");
+      btnMenu.focus();
+    }
+  });
+}
+
+
+/* ================================
+   EX. 05 & EX. 06 — LIVRO EM DESTAQUE E FICHA (data-*)
+================================ */
+
+const destaque = document.querySelector("#destaque");
+
+if (destaque) {
+  const idLivro = Number(destaque.dataset.id);
+  const estadoLivro = destaque.dataset.estado;
+  const devolucao = destaque.dataset.devolucao;
+  const autorSlug = destaque.dataset.autor || "pessoa";
+
+  const tituloDestaque = destaque.querySelector(".titulo-destaque");
+  const capaDestaque = destaque.querySelector(".capa");
+  const linkMais = destaque.querySelector(".mais");
+  const estadoTexto = destaque.querySelector(".estado-livro");
+  const btnReservar = destaque.querySelector(".reservar");
+
+  if (tituloDestaque) {
+    tituloDestaque.textContent = "Mensagem";
+  }
+
+  if (capaDestaque) {
+    capaDestaque.src = "img/mensagem.jpg";
+    capaDestaque.alt = "Capa de Mensagem, de Fernando Pessoa";
+  }
+
+  if (linkMais) {
+    linkMais.href = `/catalogo?autor=${encodeURIComponent(autorSlug)}`;
+  }
+
+  if (estadoTexto) {
+    estadoTexto.textContent = `Ficha #${idLivro} — Estado: ${estadoLivro}`;
+  }
+
+  if (btnReservar) {
+    if (estadoLivro === "emprestado") {
+      const partesData = (devolucao || "").split("-");
+      const dataFormatada = partesData.length === 3
+        ? `${partesData[2]}/${partesData[1]}`
+        : devolucao;
+
+      btnReservar.textContent = dataFormatada
+        ? `Disponível a ${dataFormatada}`
+        : "Indisponível";
+      btnReservar.disabled = true;
+    } else {
+      btnReservar.addEventListener("click", () => {
+        btnReservar.textContent = "Reservado";
+        btnReservar.disabled = true;
+        if (estadoTexto) {
+          estadoTexto.textContent = `Ficha #${idLivro} — Estado: reservado`;
+        }
+      });
+    }
   }
 }
 
@@ -173,7 +254,7 @@ document.querySelector("#letra-normal")
 
 
 /* ================================
-   CATÁLOGO
+   CATÁLOGO (Ex. 11 <template> + Ex. 15 Pesquisa em direto)
 ================================ */
 
 const livros = [
@@ -215,6 +296,9 @@ const pesquisa =
 const listaLivros =
   document.querySelector("#lista-livros");
 
+const tplLivro =
+  document.querySelector("#tpl-livro");
+
 const resumo =
   document.querySelector("#resumo");
 
@@ -223,50 +307,74 @@ const filtro =
 
 let soDisponiveis = false;
 
-function mostrarLivros(resultado) {
-  listaLivros.innerHTML = "";
+function construirCatalogo() {
+  if (!tplLivro) return;
 
-  resultado.forEach(livro => {
-    const li = document.createElement("li");
+  const fragmento = document.createDocumentFragment();
 
-    li.textContent =
-      `${livro.titulo} — ${livro.autor}`;
+  livros.forEach(livro => {
+    const clone = tplLivro.content.cloneNode(true);
+    const li = clone.querySelector(".item-catalogo");
+    const elTitulo = clone.querySelector(".titulo-livro");
+    const elAutor = clone.querySelector(".autor-livro");
+    const elBadge = clone.querySelector(".badge-emprestado");
+
+    elTitulo.textContent = livro.titulo;
+    elAutor.textContent = ` — ${livro.autor}`;
+    li.dataset.titulo = livro.titulo.toLowerCase();
+    li.dataset.autor = livro.autor.toLowerCase();
+    li.dataset.disponivel = String(livro.disponivel);
 
     if (!livro.disponivel) {
-      li.textContent += " — Emprestado";
       li.classList.add("indisponivel");
+      elBadge.hidden = false;
     }
 
-    listaLivros.appendChild(li);
+    fragmento.append(clone);
   });
 
-  resumo.textContent =
-    `${resultado.length} livros encontrados.`;
-
-  if (resultado.length === 0) {
-    listaLivros.textContent =
-      "Não foram encontrados livros.";
-  }
+  listaLivros.replaceChildren(fragmento);
 }
 
 function pesquisar() {
   const termo =
     pesquisa.value.toLowerCase().trim();
 
-  let resultado = livros.filter(livro =>
-    livro.titulo.toLowerCase().includes(termo)
-  );
+  const itens = [...listaLivros.querySelectorAll(".item-catalogo")];
+  let visiveis = 0;
 
-  if (soDisponiveis) {
-    resultado = resultado.filter(
-      livro => livro.disponivel
-    );
-  }
+  itens.forEach(li => {
+    const correspondeTermo =
+      !termo ||
+      li.dataset.titulo.includes(termo) ||
+      li.dataset.autor.includes(termo);
 
-  mostrarLivros(resultado);
+    const correspondeEstado =
+      !soDisponiveis || li.dataset.disponivel === "true";
+
+    const visivel = correspondeTermo && correspondeEstado;
+    li.hidden = !visivel;
+
+    if (visivel) {
+      visiveis++;
+    }
+  });
+
+  resumo.textContent =
+    `${visiveis} livros encontrados`;
 }
 
+construirCatalogo();
+
 pesquisa.addEventListener("input", pesquisar);
+
+// Ex. 07 / Ex. 15: Escape limpa a pesquisa no próprio campo
+pesquisa.addEventListener("keydown", evento => {
+  if (evento.key === "Escape") {
+    pesquisa.value = "";
+    pesquisa.dispatchEvent(new Event("input"));
+  }
+});
 
 filtro.addEventListener("click", () => {
   soDisponiveis = !soDisponiveis;
@@ -447,7 +555,7 @@ document.querySelector("#apagar-ficha")
 
 
 /* ================================
-   EXERCÍCIO 8 — LISTA DE LEITURA
+   EX. 12 & EX. 13 — LISTA DE LEITURA (Delegação + data-acao)
 ================================ */
 
 let leitura = ler(
@@ -474,70 +582,99 @@ function atualizarLeitura() {
 }
 
 function mostrarLeitura() {
-  listaLeitura.innerHTML = "";
+  const fragmento = document.createDocumentFragment();
 
   leitura.forEach((livro, indice) => {
     const li = document.createElement("li");
-
     li.className = "item-leitura";
+    li.dataset.indice = String(indice);
 
     const texto = document.createElement("span");
-
+    texto.className = "titulo-leitura";
     texto.textContent = livro.titulo;
 
     if (livro.lido) {
       texto.classList.add("lido");
     }
 
-    const marcar = document.createElement("button");
+    const acoes = document.createElement("div");
 
-    marcar.textContent = livro.lido
-      ? "Marcar por ler"
-      : "Marcar lido";
+    const subir = document.createElement("button");
+    subir.type = "button";
+    subir.textContent = "↑";
+    subir.dataset.acao = "subir";
+    subir.setAttribute("aria-label", `Subir ${livro.titulo}`);
 
-    marcar.addEventListener("click", () => {
-      leitura[indice].lido =
-        !leitura[indice].lido;
-
-      atualizarLeitura();
-    });
+    const descer = document.createElement("button");
+    descer.type = "button";
+    descer.textContent = "↓";
+    descer.dataset.acao = "descer";
+    descer.setAttribute("aria-label", `Descer ${livro.titulo}`);
 
     const apagar = document.createElement("button");
-
+    apagar.type = "button";
     apagar.textContent = "Remover";
+    apagar.dataset.acao = "remover";
 
-    apagar.addEventListener("click", () => {
-      leitura.splice(indice, 1);
-
-      atualizarLeitura();
-    });
-
-    li.append(texto, marcar, apagar);
-
-    listaLeitura.appendChild(li);
+    acoes.append(subir, descer, apagar);
+    li.append(texto, acoes);
+    fragmento.append(li);
   });
+
+  listaLeitura.replaceChildren(fragmento);
 
   estadoLeitura.textContent =
     `${leitura.length} livros na lista.`;
 }
 
+// Um único ouvinte na lista para marcar como lido, subir, descer e remover
+listaLeitura.addEventListener("click", evento => {
+  const li = evento.target.closest(".item-leitura");
+  if (!li) return;
+
+  const indice = Number(li.dataset.indice);
+  if (Number.isNaN(indice) || !leitura[indice]) return;
+
+  const botao = evento.target.closest("button[data-acao]");
+
+  if (!botao) {
+    leitura[indice].lido = !leitura[indice].lido;
+    atualizarLeitura();
+    return;
+  }
+
+  const acao = botao.dataset.acao;
+
+  if (acao === "remover") {
+    leitura.splice(indice, 1);
+    atualizarLeitura();
+  } else if (acao === "subir" && indice > 0) {
+    const atual = leitura[indice];
+    leitura[indice] = leitura[indice - 1];
+    leitura[indice - 1] = atual;
+    atualizarLeitura();
+  } else if (acao === "descer" && indice < leitura.length - 1) {
+    const atual = leitura[indice];
+    leitura[indice] = leitura[indice + 1];
+    leitura[indice + 1] = atual;
+    atualizarLeitura();
+  }
+});
+
 formLeitura.addEventListener("submit", evento => {
   evento.preventDefault();
 
-  const titulo =
-    document.querySelector("#novo-livro")
-      .value.trim();
+  const campoLivro = document.querySelector("#novo-livro");
+  const titulo = campoLivro.value.trim();
 
   if (!titulo) return;
 
   leitura.push({
-    titulo: titulo,
+    titulo,
     lido: false
   });
 
-  document.querySelector("#novo-livro")
-    .value = "";
-
+  campoLivro.value = "";
   atualizarLeitura();
 });
 
@@ -573,11 +710,14 @@ fecharAviso.addEventListener("click", () => {
 
 
 /* ================================
-   RASCUNHO DE SUGESTÃO
+   RASCUNHO DE SUGESTÃO + EX. 07 (Contador de caracteres)
 ================================ */
 
 const sugestao =
   document.querySelector("#sugestao");
+
+const contadorSugestao =
+  document.querySelector("#contador-sugestao");
 
 const formSugestao =
   document.querySelector("#form-sugestao");
@@ -585,12 +725,22 @@ const formSugestao =
 const estadoSugestao =
   document.querySelector("#estado-sugestao");
 
+function atualizarContadorSugestao() {
+  if (!contadorSugestao) return;
+  const n = sugestao.value.length;
+  contadorSugestao.textContent = `${n}/200`;
+  contadorSugestao.classList.toggle("alerta-limite", n > 180);
+}
+
 sugestao.value = ler(
   "biblioteca:rascunho",
   ""
 );
 
+atualizarContadorSugestao();
+
 sugestao.addEventListener("input", () => {
+  atualizarContadorSugestao();
   guardarTexto(
     "biblioteca:rascunho",
     sugestao.value
@@ -611,11 +761,53 @@ formSugestao.addEventListener("submit", evento => {
     "Sugestão enviada (demonstração).";
 
   sugestao.value = "";
+  atualizarContadorSugestao();
 
   localStorage.removeItem(
     "biblioteca:rascunho"
   );
 });
+
+
+/* ================================
+   EX. 14 — INSCRIÇÃO NO CLUBE (FormData + setCustomValidity)
+================================ */
+
+const formClube = document.querySelector("#form-clube");
+const campoNomeClube = document.querySelector("#nome-clube");
+const resumoClube = document.querySelector("#resumo-clube");
+
+if (formClube && campoNomeClube && resumoClube) {
+  campoNomeClube.addEventListener("input", evento => {
+    const partes = evento.target.value.trim().split(/\s+/);
+    const mensagem = partes.length < 2
+      ? "Escreve nome e apelido."
+      : "";
+    evento.target.setCustomValidity(mensagem);
+  });
+
+  formClube.addEventListener("submit", evento => {
+    evento.preventDefault();
+
+    const partes = campoNomeClube.value.trim().split(/\s+/);
+    if (partes.length < 2) {
+      campoNomeClube.setCustomValidity("Escreve nome e apelido.");
+      campoNomeClube.reportValidity();
+      return;
+    }
+
+    const dados = new FormData(formClube);
+    const primeiroNome = String(dados.get("nome") || "").trim().split(/\s+/)[0];
+    const clube = String(dados.get("clube") || "");
+
+    resumoClube.textContent =
+      `Obrigado, ${primeiroNome}! Inscrição no clube ${clube}.`;
+
+    formClube.reset();
+    campoNomeClube.setCustomValidity("");
+    campoNomeClube.focus();
+  });
+}
 
 
 /* ================================

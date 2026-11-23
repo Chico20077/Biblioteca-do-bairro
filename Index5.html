@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script>
+        var contador = 0;
+
+        var notas = [11, 12, 15, 17, 6, 10];
+        var disciplinas = ["Matemática", "Português", "História", "Geografia", "Física", "Química"];
+
+        function mostrarNome() {
+            var nome = document.getElementById("nome").value;
+            document.getElementById("resposta").innerHTML = "O meu nome é: " + nome;
+        }
+
+        function incrementa() {
+            contador++;
+            document.getElementById("contador").innerHTML = contador;
+
+            if (contador >= 0) {
+                document.getElementById("contador").setAttribute("style", "color:darkgreen");
+            }
+        }
+
+        function decrementa() {
+            contador--;
+            document.getElementById("contador").innerHTML = contador;
+
+            if (contador < 0) {
+                document.getElementById("contador").setAttribute("style", "color:red");
+            } else {
+                document.getElementById("contador").setAttribute("style", "color:darkgreen");
+            }
+        }
+
+        function mostrarPauta() {
+            var tabela = document.getElementById("tabelaPauta");
+
+            tabela.innerHTML = `
+                <tr>
+                    <th>Disciplina</th>
+                    <th>Nota</th>
+                </tr>
+            `;
+
+            for (var i = 0; i < disciplinas.length; i++) {
+                tabela.innerHTML += `
+                    <tr>
+                        <td>${disciplinas[i]}</td>
+                        <td>${notas[i]}</td>
+                    </tr>
+                `;
+            }
+        }
+    </script>
+</head>
+
+<body>
+
+    <h1>Introdução</h1>
+
+    <input type="text" placeholder="Digite seu nome" id="nome">
+
+    <input type="button" value="Clicar" onclick="mostrarNome()">
+
+    <p id="resposta">O meu nome é:</p>
+
+    <p id="contador">0</p>
+
+    <input type="button" value="+" onclick="incrementa()">
+    <input type="button" value="-" onclick="decrementa()">
+
+    <h1>Pauta</h1>
+
+    <input type="button" value="Mostrar Pauta" onclick="mostrarPauta()">
+
+    <table border="1">
+        <tbody id="tabelaPauta">
+            <tr>
+                <th>Disciplina</th>
+                <th>Nota</th>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>
