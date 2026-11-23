@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-PT">
 <head>
@@ -10,16 +9,27 @@
 </head>
 <body>
   <header class="cabecalho" id="inicio">
-    <div>
-      <h1>Biblioteca do Bairro</h1>
-      <p>Um lugar para descobrir histórias.</p>
+    <div class="topo-cabecalho">
+      <div>
+        <h1>Biblioteca do Bairro</h1>
+        <p>Um lugar para descobrir histórias.</p>
+      </div>
+
+      <button id="abrir-menu"
+              type="button"
+              aria-expanded="false"
+              aria-controls="menu-principal">
+        Menu
+      </button>
     </div>
 
-    <nav>
+    <nav id="menu-principal" aria-label="Navegação principal">
       <ul>
         <li><a href="#inicio">Início</a></li>
+        <li><a href="#destaque">Destaque</a></li>
         <li><a href="#catalogo">Catálogo</a></li>
         <li><a href="#leitura">Lista de leitura</a></li>
+        <li><a href="#inscricao">Clube</a></li>
         <li><a href="#dados">Os meus dados</a></li>
       </ul>
     </nav>
@@ -27,7 +37,7 @@
 
   <section id="aviso-visita" hidden>
     <p>Hoje a biblioteca fecha às 13h.</p>
-    <button id="fechar-aviso">Fechar aviso</button>
+    <button id="fechar-aviso" type="button">Fechar aviso</button>
   </section>
 
   <main>
@@ -36,49 +46,88 @@
       <p>A biblioteca abriu em 1987 e tem mais de 20 000 livros.</p>
     </section>
 
+    <section id="destaque" class="cartao">
+      <h2>Livro em destaque</h2>
+      <article class="ficha-destaque"
+               data-id="42"
+               data-estado="emprestado"
+               data-devolucao="2026-12-03">
+        <img class="capa" src="img/mensagem.jpg" alt="">
+        <div>
+          <h3 class="titulo-destaque">Título inicial</h3>
+          <p class="estado-destaque"></p>
+          <a class="mais" href="/catalogo">Ver mais</a>
+          <div>
+            <button class="reservar" type="button">Reservar</button>
+          </div>
+        </div>
+      </article>
+    </section>
+
     <section class="cartao">
       <h2>Preferências</h2>
 
-      <button id="tema">Alternar tema escuro</button>
-      <button id="seguir-sistema">Seguir o sistema</button>
+      <button id="tema" type="button">Alternar tema escuro</button>
+      <button id="seguir-sistema" type="button">Seguir o sistema</button>
 
-      <button id="letra-menor">A−</button>
-      <button id="letra-maior">A+</button>
-      <button id="letra-normal">Letra normal</button>
+      <button id="letra-menor" type="button">A−</button>
+      <button id="letra-maior" type="button">A+</button>
+      <button id="letra-normal" type="button">Letra normal</button>
 
-      <p id="estado-preferencias"></p>
+      <p id="estado-preferencias" role="status"></p>
     </section>
 
-    <section id="catalogo">
+    <section id="catalogo" class="cartao">
       <h2>Catálogo</h2>
 
-      <input id="pesquisa" type="search"
+      <label for="pesquisa">Pesquisar livros</label>
+      <input id="pesquisa"
+             name="q"
+             type="search"
              placeholder="Pesquisar livros...">
 
-      <button id="so-disponiveis">
+      <button id="so-disponiveis" type="button">
         Mostrar apenas disponíveis
       </button>
 
-      <p id="resumo"></p>
+      <p id="resumo" role="status"></p>
       <ul id="lista-livros"></ul>
+
+      <template id="tpl-livro">
+        <li class="livro">
+          <strong class="titulo"></strong>
+          <span class="autor"></span>
+          <span class="badge" hidden> — Emprestado</span>
+        </li>
+      </template>
 
       <h3>Últimas pesquisas</h3>
       <ul id="ultimas-pesquisas"></ul>
-      <button id="limpar-pesquisas">Limpar histórico</button>
+      <button id="limpar-pesquisas" type="button">Limpar histórico</button>
     </section>
 
     <section id="leitura" class="cartao">
       <h2>Lista de leitura</h2>
 
       <form id="form-leitura">
+        <label for="novo-livro">Novo livro</label>
         <input id="novo-livro"
                placeholder="Nome do livro"
                required>
-        <button>Adicionar</button>
+        <button type="submit">Adicionar</button>
       </form>
 
       <ul id="lista-leitura"></ul>
-      <p id="estado-leitura"></p>
+      <p id="estado-leitura" role="status"></p>
+
+      <div class="progresso-leitura">
+        <label for="progresso-range">Progresso de leitura</label>
+        <input id="progresso-range" type="range" min="0" max="100" value="0">
+        <p id="percentagem-leitura">0% lido</p>
+        <div class="barra-fundo">
+          <div class="progresso"></div>
+        </div>
+      </div>
     </section>
 
     <section class="cartao">
@@ -92,45 +141,75 @@
         <input id="cartao-leitor" value="1234">
 
         <label for="generos-leitor">Géneros</label>
-        <input id="generos-leitor"
-               value="Aventura">
+        <input id="generos-leitor" value="Aventura">
 
-        <button>Guardar ficha</button>
+        <button type="submit">Guardar ficha</button>
       </form>
 
       <p id="saudacao-leitor"></p>
       <ul id="generos-lista"></ul>
 
-      <button id="apagar-ficha">Apagar ficha</button>
+      <button id="apagar-ficha" type="button">Apagar ficha</button>
+    </section>
+
+    <section id="inscricao" class="cartao">
+      <h2>Inscrição no clube</h2>
+
+      <form id="form-inscricao">
+        <label for="nome-inscricao">Nome completo (nome e apelido)</label>
+        <input id="nome-inscricao" name="nome" type="text" required>
+
+        <label for="email-inscricao">E-mail</label>
+        <input id="email-inscricao" name="email" type="email" required>
+
+        <label for="clube-inscricao">Clube</label>
+        <select id="clube-inscricao" name="clube">
+          <option value="Policiais">Policiais</option>
+          <option value="Ficção Científica">Ficção Científica</option>
+          <option value="Clássicos">Clássicos</option>
+        </select>
+
+        <label class="checkbox-linha">
+          <input id="regras-inscricao" name="regras" type="checkbox" required>
+          Aceito as regras do clube
+        </label>
+
+        <button type="submit">Inscrever</button>
+      </form>
+
+      <p id="resumo-inscricao" role="status"></p>
     </section>
 
     <section class="cartao">
       <h2>Sugerir um livro</h2>
 
       <form id="form-sugestao">
+        <label for="sugestao">A tua sugestão</label>
         <textarea id="sugestao"
+                  maxlength="200"
                   placeholder="A tua sugestão"></textarea>
+        <p id="contador-sugestao">0/200</p>
 
-        <button>Enviar sugestão</button>
+        <button type="submit">Enviar sugestão</button>
       </form>
 
-      <p id="estado-sugestao"></p>
+      <p id="estado-sugestao" role="status"></p>
     </section>
 
     <section id="dados" class="cartao">
       <h2>Os meus dados</h2>
 
-      <button id="ver-dados">
+      <button id="ver-dados" type="button">
         Ver dados guardados
       </button>
 
       <pre id="dados-guardados"></pre>
 
-      <button id="apagar-dados">
+      <button id="apagar-dados" type="button">
         Apagar os dados deste site
       </button>
 
-      <p id="estado-dados"></p>
+      <p id="estado-dados" role="status"></p>
     </section>
   </main>
 
@@ -139,7 +218,7 @@
     <p>Aberto das 09h às 20h.</p>
 
     <p id="contador-visitas"></p>
-    <button id="recomecar-visitas">
+    <button id="recomecar-visitas" type="button">
       Recomeçar contador
     </button>
   </aside>

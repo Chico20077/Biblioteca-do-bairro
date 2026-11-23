@@ -1,4 +1,3 @@
-
 /* ================================
    FUNÇÕES DE ARMAZENAMENTO
 ================================ */
@@ -67,7 +66,7 @@ recomecar.addEventListener("click", () => {
 
 
 /* ================================
-   EXERCÍCIO 7 — TEMA
+   EXERCÍCIO 7 & DOM EX. 09 — TEMA E MENU
 ================================ */
 
 const botaoTema = document.querySelector("#tema");
@@ -123,6 +122,26 @@ seguirSistema.addEventListener("click", () => {
 
 aplicarTema();
 
+const botaoMenu = document.querySelector("#abrir-menu");
+const menuPrincipal = document.querySelector("#menu-principal");
+
+function definirMenu(aberto) {
+  menuPrincipal.classList.toggle("aberto", aberto);
+  botaoMenu.setAttribute("aria-expanded", String(aberto));
+}
+
+botaoMenu.addEventListener("click", () => {
+  const estaAberto = menuPrincipal.classList.contains("aberto");
+  definirMenu(!estaAberto);
+});
+
+document.addEventListener("keydown", (evento) => {
+  if (evento.key === "Escape" && menuPrincipal.classList.contains("aberto")) {
+    definirMenu(false);
+    botaoMenu.focus();
+  }
+});
+
 
 /* ================================
    TAMANHO DA LETRA
@@ -173,7 +192,41 @@ document.querySelector("#letra-normal")
 
 
 /* ================================
-   CATÁLOGO
+   DOM EX. 05 & 06 — LIVRO EM DESTAQUE
+================================ */
+
+const destaque = document.querySelector("#destaque .ficha-destaque");
+const tituloDestaque = destaque.querySelector(".titulo-destaque");
+const capaDestaque = destaque.querySelector(".capa");
+const linkMais = destaque.querySelector(".mais");
+const estadoDestaque = destaque.querySelector(".estado-destaque");
+const botaoReservar = destaque.querySelector(".reservar");
+
+const idDestaque = Number(destaque.dataset.id);
+const estadoInicialDestaque = destaque.dataset.estado;
+
+tituloDestaque.textContent = "Mensagem";
+capaDestaque.src = "img/mensagem.jpg";
+capaDestaque.alt = "Capa de Mensagem, de Fernando Pessoa";
+linkMais.href = "/catalogo?autor=pessoa";
+estadoDestaque.textContent = `Estado (ID ${idDestaque}): ${estadoInicialDestaque}`;
+
+if (estadoInicialDestaque === "emprestado") {
+  const [, mes, dia] = destaque.dataset.devolucao.split("-");
+  botaoReservar.textContent = `Disponível a ${dia}/${mes}`;
+  botaoReservar.disabled = true;
+}
+
+botaoReservar.addEventListener("click", () => {
+  destaque.dataset.estado = "emprestado";
+  botaoReservar.textContent = "Reservado";
+  botaoReservar.disabled = true;
+  estadoDestaque.textContent = `Estado (ID ${idDestaque}): emprestado`;
+});
+
+
+/* ================================
+   CATÁLOGO + DOM EX. 11 & 15 (<template> E PESQUISA)
 ================================ */
 
 const livros = [
@@ -215,6 +268,9 @@ const pesquisa =
 const listaLivros =
   document.querySelector("#lista-livros");
 
+const tplLivro =
+  document.querySelector("#tpl-livro");
+
 const resumo =
   document.querySelector("#resumo");
 
@@ -223,50 +279,68 @@ const filtro =
 
 let soDisponiveis = false;
 
-function mostrarLivros(resultado) {
-  listaLivros.innerHTML = "";
+function construirCatalogo() {
+  const fragmento = document.createDocumentFragment();
 
-  resultado.forEach(livro => {
-    const li = document.createElement("li");
+  livros.forEach((livro) => {
+    const clone = tplLivro.content.cloneNode(true);
+    const li = clone.querySelector(".livro");
+    const tituloEl = clone.querySelector(".titulo");
+    const autorEl = clone.querySelector(".autor");
+    const badgeEl = clone.querySelector(".badge");
 
-    li.textContent =
-      `${livro.titulo} — ${livro.autor}`;
+    li.dataset.estado = livro.disponivel ? "disponivel" : "emprestado";
+    li.dataset.pesquisa = `${livro.titulo} ${livro.autor}`.toLowerCase();
+
+    tituloEl.textContent = livro.titulo;
+    autorEl.textContent = ` — ${livro.autor}`;
 
     if (!livro.disponivel) {
-      li.textContent += " — Emprestado";
       li.classList.add("indisponivel");
+      badgeEl.hidden = false;
     }
 
-    listaLivros.appendChild(li);
+    fragmento.append(clone);
   });
 
-  resumo.textContent =
-    `${resultado.length} livros encontrados.`;
-
-  if (resultado.length === 0) {
-    listaLivros.textContent =
-      "Não foram encontrados livros.";
-  }
+  listaLivros.replaceChildren(fragmento);
 }
+
+construirCatalogo();
 
 function pesquisar() {
   const termo =
-    pesquisa.value.toLowerCase().trim();
+    pesquisa.value.trim().toLowerCase();
 
-  let resultado = livros.filter(livro =>
-    livro.titulo.toLowerCase().includes(termo)
-  );
+  const itens = [...listaLivros.querySelectorAll(".livro")];
+  let visiveis = 0;
 
-  if (soDisponiveis) {
-    resultado = resultado.filter(
-      livro => livro.disponivel
-    );
-  }
+  itens.forEach((li) => {
+    const correspondeTexto =
+      !termo || li.dataset.pesquisa.includes(termo);
+    const correspondeEstado =
+      !soDisponiveis || li.dataset.estado === "disponivel";
 
-  mostrarLivros(resultado);
+    const visivel = correspondeTexto && correspondeEstado;
+    li.hidden = !visivel;
+
+    if (visivel) {
+      visiveis++;
+    }
+  });
+
+  resumo.textContent =
+    `${visiveis} livros encontrados.`;
 }
 
 pesquisa.addEventListener("input", pesquisar);
+
+pesquisa.addEventListener("keydown", (evento) => {
+  if (evento.key === "Escape") {
+    pesquisa.value = "";
+    pesquisa.dispatchEvent(new Event("input"));
+  }
+});
 
 filtro.addEventListener("click", () => {
   soDisponiveis = !soDisponiveis;
@@ -319,6 +393,7 @@ function mostrarPesquisas() {
 
     const botao = document.createElement("button");
 
+    botao.type = "button";
     botao.textContent = termo;
 
     botao.addEventListener("click", () => {
@@ -447,7 +522,7 @@ document.querySelector("#apagar-ficha")
 
 
 /* ================================
-   EXERCÍCIO 8 — LISTA DE LEITURA
+   EXERCÍCIO 8 & DOM EX. 12–13 — LISTA DE LEITURA (DELEGAÇÃO)
 ================================ */
 
 let leitura = ler(
@@ -464,6 +539,18 @@ const estadoLeitura =
 const formLeitura =
   document.querySelector("#form-leitura");
 
+function sincronizarOrdemLeitura() {
+  const titulosOrdenados = [...listaLeitura.querySelectorAll(".item-leitura")].map((li) => ({
+    titulo: li.querySelector(".titulo-item").textContent,
+    lido: li.querySelector(".titulo-item").classList.contains("lido")
+  }));
+
+  leitura = titulosOrdenados;
+  guardar("biblioteca:leitura", leitura);
+  estadoLeitura.textContent =
+    `${leitura.length} livros na lista.`;
+}
+
 function atualizarLeitura() {
   guardar(
     "biblioteca:leitura",
@@ -476,44 +563,37 @@ function atualizarLeitura() {
 function mostrarLeitura() {
   listaLeitura.innerHTML = "";
 
-  leitura.forEach((livro, indice) => {
+  leitura.forEach((livro) => {
     const li = document.createElement("li");
-
     li.className = "item-leitura";
 
     const texto = document.createElement("span");
-
+    texto.className = "titulo-item";
     texto.textContent = livro.titulo;
 
     if (livro.lido) {
       texto.classList.add("lido");
     }
 
-    const marcar = document.createElement("button");
+    const acoes = document.createElement("div");
 
-    marcar.textContent = livro.lido
-      ? "Marcar por ler"
-      : "Marcar lido";
+    const subir = document.createElement("button");
+    subir.type = "button";
+    subir.textContent = "↑";
+    subir.dataset.acao = "subir";
 
-    marcar.addEventListener("click", () => {
-      leitura[indice].lido =
-        !leitura[indice].lido;
-
-      atualizarLeitura();
-    });
+    const descer = document.createElement("button");
+    descer.type = "button";
+    descer.textContent = "↓";
+    descer.dataset.acao = "descer";
 
     const apagar = document.createElement("button");
-
+    apagar.type = "button";
     apagar.textContent = "Remover";
+    apagar.dataset.acao = "remover";
 
-    apagar.addEventListener("click", () => {
-      leitura.splice(indice, 1);
-
-      atualizarLeitura();
-    });
-
-    li.append(texto, marcar, apagar);
-
+    acoes.append(subir, descer, apagar);
+    li.append(texto, acoes);
     listaLeitura.appendChild(li);
   });
 
@@ -521,12 +601,36 @@ function mostrarLeitura() {
     `${leitura.length} livros na lista.`;
 }
 
+listaLeitura.addEventListener("click", (evento) => {
+  const li = evento.target.closest(".item-leitura");
+  if (!li) return;
+
+  const botao = evento.target.closest("button");
+
+  if (!botao) {
+    li.querySelector(".titulo-item")?.classList.toggle("lido");
+    sincronizarOrdemLeitura();
+    return;
+  }
+
+  const acao = botao.dataset.acao;
+
+  if (acao === "subir") {
+    li.previousElementSibling?.before(li);
+  } else if (acao === "descer") {
+    li.nextElementSibling?.after(li);
+  } else if (acao === "remover") {
+    li.remove();
+  }
+
+  sincronizarOrdemLeitura();
+});
+
 formLeitura.addEventListener("submit", evento => {
   evento.preventDefault();
 
-  const titulo =
-    document.querySelector("#novo-livro")
-      .value.trim();
+  const campoLivro = document.querySelector("#novo-livro");
+  const titulo = campoLivro.value.trim();
 
   if (!titulo) return;
 
@@ -535,13 +639,64 @@ formLeitura.addEventListener("submit", evento => {
     lido: false
   });
 
-  document.querySelector("#novo-livro")
-    .value = "";
+  campoLivro.value = "";
 
   atualizarLeitura();
 });
 
 mostrarLeitura();
+
+
+/* ================================
+   DOM EX. 10 — PROGRESSO DE LEITURA
+================================ */
+
+const progressoRange = document.querySelector("#progresso-range");
+const barraProgresso = document.querySelector(".progresso");
+const percentagemLeitura = document.querySelector("#percentagem-leitura");
+
+function atualizarProgresso() {
+  const valor = Number(progressoRange.value);
+  barraProgresso.style.width = `${valor}%`;
+  percentagemLeitura.textContent = `${valor}% lido`;
+  barraProgresso.classList.toggle("completo", valor === 100);
+}
+
+progressoRange.addEventListener("input", atualizarProgresso);
+atualizarProgresso();
+
+
+/* ================================
+   DOM EX. 14 — INSCRIÇÃO NO CLUBE
+================================ */
+
+const formInscricao = document.querySelector("#form-inscricao");
+const campoNomeInscricao = document.querySelector("#nome-inscricao");
+const resumoInscricao = document.querySelector("#resumo-inscricao");
+
+campoNomeInscricao.addEventListener("input", (evento) => {
+  const partes = evento.target.value.trim().split(/\s+/);
+  const mensagem = partes.length < 2
+    ? "Escreve nome e apelido."
+    : "";
+  evento.target.setCustomValidity(mensagem);
+});
+
+formInscricao.addEventListener("submit", (evento) => {
+  evento.preventDefault();
+
+  const dados = new FormData(formInscricao);
+  const nomeCompleto = String(dados.get("nome") || "").trim();
+  const primeiroNome = nomeCompleto.split(/\s+/)[0] || "";
+  const clube = dados.get("clube");
+
+  resumoInscricao.textContent =
+    `Obrigado, ${primeiroNome}! Inscrição no clube ${clube}.`;
+
+  formInscricao.reset();
+  campoNomeInscricao.setCustomValidity("");
+  campoNomeInscricao.focus();
+});
 
 
 /* ================================
@@ -573,11 +728,14 @@ fecharAviso.addEventListener("click", () => {
 
 
 /* ================================
-   RASCUNHO DE SUGESTÃO
+   RASCUNHO DE SUGESTÃO + DOM EX. 07 CONTADOR
 ================================ */
 
 const sugestao =
   document.querySelector("#sugestao");
+
+const contadorSugestao =
+  document.querySelector("#contador-sugestao");
 
 const formSugestao =
   document.querySelector("#form-sugestao");
@@ -585,12 +743,21 @@ const formSugestao =
 const estadoSugestao =
   document.querySelector("#estado-sugestao");
 
+function atualizarContadorSugestao() {
+  const total = sugestao.value.length;
+  contadorSugestao.textContent = `${total}/200`;
+  contadorSugestao.classList.toggle("alerta", total > 180);
+}
+
 sugestao.value = ler(
   "biblioteca:rascunho",
   ""
 );
 
+atualizarContadorSugestao();
+
 sugestao.addEventListener("input", () => {
+  atualizarContadorSugestao();
   guardarTexto(
     "biblioteca:rascunho",
     sugestao.value
@@ -611,6 +778,7 @@ formSugestao.addEventListener("submit", evento => {
     "Sugestão enviada (demonstração).";
 
   sugestao.value = "";
+  atualizarContadorSugestao();
 
   localStorage.removeItem(
     "biblioteca:rascunho"
